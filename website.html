@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+    <style>
+        /* General Styling to match the cute aesthetic */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffeef2; /* Light pink background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 90%;
+            width: 400px;
+            position: relative;
+        }
+
+        h1 {
+            color: #d63384;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin: 10px;
+        }
+
+        .btn-primary {
+            background-color: #ff4d6d;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #ff2a55;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background-color: #ffccd5;
+            color: #d63384;
+        }
+
+        /* The tricky No button */
+        #no-btn {
+            position: relative; 
+        }
+
+        /* Hidden class for switching pages */
+        .hidden {
+            display: none;
+        }
+
+        /* Error Popup Styling */
+        .error-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid #ff4d6d;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 100;
+            text-align: center;
+        }
+
+        .error-header {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Confetti Canvas */
+        #confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti"></canvas>
+
+    <div class="container" id="page1">
+        <h1>Hiii 😌</h1>
+        <p>I have a very important question...</p>
+        <p><small>Please take this very seriously.</small></p>
+        <button class="btn btn-primary" onclick="nextPage(2)">Okay...??</button>
+    </div>
+
+    <div class="container hidden" id="page2">
+        <h1>Will you be my Valentine? 💝</h1>
+        <p>Choose wisely.</p>
+        <button class="btn btn-primary" onclick="nextPage(3)">YES</button>
+        <button class="btn btn-secondary" id="no-btn" onmouseover="moveButton()">NO</button>
+    </div>
+
+    <div class="error-popup hidden" id="error-popup">
+        <div class="error-header">❌ ERROR</div>
+        <p>"No" is currently unavailable.<br>Please try YES.</p>
+        <button class="btn btn-primary" onclick="closeError()">Okay, YES</button>
+    </div>
+
+    <div class="container hidden" id="page3">
+        <h1>WAIT 😳</h1>
+        <p>Are you sure?</p>
+        <button class="btn btn-secondary" onclick="nextPage(4)">Yes</button>
+        <button class="btn btn-primary" onclick="nextPage(4)">Yes but louder</button>
+    </div>
+
+    <div class="container hidden" id="page4">
+        <h1>Even if I annoy you every single day? 😈</h1>
+        <button class="btn btn-secondary" onclick="nextPage(5)">You already do</button>
+        <button class="btn btn-primary" onclick="nextPage(5)">Still yes</button>
+    </div>
+
+    <div class="container hidden" id="page5">
+        <h1>Even if I steal your snacks? 🍪</h1>
+        <button class="btn btn-secondary" onmouseover="this.style.display='none'">NEVER</button>
+        <button class="btn btn-primary" onclick="nextPage(6)">Fine</button>
+    </div>
+
+    <div class="container hidden" id="page6">
+        <h1>YAYYYYY 🎉💖</h1>
+        <p>You are officially, legally, emotionally <strong>MY VALENTINE</strong>.</p>
+        <p><small>No refunds. No returns.</small></p>
+        <button class="btn btn-primary" onclick="alert('I love you too! ❤️')">Okay fine I love you</button>
+    </div>
+
+    <script>
+        function nextPage(pageNumber) {
+            // Hide all pages
+            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            // Show the specific page
+            document.getElementById(`page${pageNumber}`).classList.remove('hidden');
+            
+            // If it's the final page, launch confetti
+            if (pageNumber === 6) {
+                startConfetti();
+            }
+        }
+
+        // The "No" button logic
+        let noClickCount = 0;
+        function moveButton() {
+            const btn = document.getElementById('no-btn');
+            noClickCount++;
+
+            // Logic to mimic the video's escalation
+            if (noClickCount === 1) {
+                btn.innerText = "Too slow 🐌";
+            } else if (noClickCount === 2) {
+                btn.innerText = "Why are you chasing? 🏃";
+            } else if (noClickCount >= 3) {
+                // Show the error popup
+                document.getElementById('error-popup').classList.remove('hidden');
+                return; 
+            }
+
+            // Move the button to a random spot within the container
+            const x = Math.random() * 200 - 100; // random x
+            const y = Math.random() * 200 - 100; // random y
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        function closeError() {
+            document.getElementById('error-popup').classList.add('hidden');
+            nextPage(3); // Force them to the next "Yes" step
+        }
+
+        // Simple Confetti Script
+        function startConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const colors = ['#ff4d6d', '#ffccd5', '#d63384', '#ffd60a'];
+
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 5 + 5,
+                    speed: Math.random() * 5 + 2
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    if (p.y > canvas.height) p.y = -10;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, p.size, p.size);
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
